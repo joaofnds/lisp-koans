@@ -49,9 +49,45 @@
 ;
 ; Your goal is to write the score method.
 
+(defun remove-sublist (sublist from-list)
+  (let ((start (search sublist from-list))
+        (len (length sublist)))
+    (if start
+        (remove t from-list :test #'(lambda (a b) t) :start start :count len)
+        from-list)))
+
+(defvar *scores*
+  '(((1 1 1) . 1000)
+    ((9 9 9) . 900)
+    ((8 8 8) . 800)
+    ((7 7 7) . 700)
+    ((6 6 6) . 600)
+    ((5 5 5) . 500)
+    ((4 4 4) . 400)
+    ((3 3 3) . 300)
+    ((2 2 2) . 200)
+    ((1) . 100)
+    ((5) . 50)
+    ((2) . 0)
+    ((3) . 0)
+    ((4) . 0)
+    ((6) . 0)
+    ((7) . 0)
+    ((8) . 0)
+    ((9) . 0)
+    (() . 0)))
+
+(defun sequence-score (dice seq)
+  (search seq dice))
+
 (defun score (dice)
-  ; You need to write this method
-)
+  (loop :with d := (copy-seq dice)
+        :while d
+        :for (seq . points) := (assoc d *scores* :test #'sequence-score)
+        :when seq
+          :sum points
+          :and :do (setf d (remove-sublist seq d))))
+
 
 (define-test test-score-of-an-empty-list-is-zero
     (assert-equal 0 (score nil)))
